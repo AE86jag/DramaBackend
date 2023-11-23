@@ -20,26 +20,6 @@
         <result column="create_time" property="createTime"/>
     </resultMap>
 
-    <resultMap id="BaseResultMapWithRoles" type="com.spmystery.episode.user.entity.User">
-        <id column="id" property="id"/>
-        <result column="mobile" property="mobile"/>
-        <result column="nickname" property="nickname"/>
-        <result column="open_id" property="openId"/>
-        <result column="union_id" property="unionId"/>
-        <result column="head_img_url" property="headImgUrl"/>
-        <result column="province" property="province"/>
-        <result column="city" property="city"/>
-        <result column="country" property="country"/>
-        <result column="sex" property="sex"/>
-        <result column="status" property="status"/>
-        <result column="invite_user_id" property="inviteUserId"/>
-        <result column="last_modify_time" property="lastModifyTime"/>
-        <result column="create_time" property="createTime"/>
-        <collection property="roleIds" javaType="list" ofType="String">
-            <result column="role_id"/>
-        </collection>
-    </resultMap>
-
     <sql id="BaseColumnList">
         id, mobile, nickname, open_id, union_id, head_img_url, province, city,
         country, sex, status, invite_user_id, last_modify_time, create_time
@@ -67,4 +47,19 @@
         FROM `user`
         WHERE open_id = #{openId} AND
     </select>
+
+    <update id="updateById" parameterType="User">
+        UPDATE
+            `user`
+        SET
+            nickname = #{nickname},
+            union_id = #{unionId},
+            head_img_url = #{headImgUrl},
+            province = #{province},
+            city = #{city},
+            country = #{country},
+            sex = #{sex},
+            status = 1
+        WHERE id = #{id}
+    </update>
 </mapper>

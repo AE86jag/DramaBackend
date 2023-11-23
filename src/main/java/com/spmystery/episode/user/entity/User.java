@@ -1,5 +1,6 @@
 package com.spmystery.episode.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,8 +14,6 @@ public class User {
     private String mobile;
 
     private String nickname;
-
-    private List<String> roleIds;
 
     private String openId;
 
@@ -49,7 +48,18 @@ public class User {
     private LocalDateTime lastModifyTime;
     private LocalDateTime createTime;
 
+    @JsonIgnore
     public boolean isValid() {
         return status != null && status.equals(1);
+    }
+
+    public void update(User user) {
+        nickname = user.getNickname();
+        headImgUrl = user.getHeadImgUrl();
+        unionId = user.getUnionId();
+        province = user.getProvince();
+        city = user.getCity();
+        country = user.getCountry();
+        sex = user.getSex();
     }
 }

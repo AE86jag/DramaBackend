@@ -3,4 +3,4 @@ server:
 
 mybatis:
   mapper-locations: classpath:mappers/*Mapper.xml
-  type-aliases-package: com.spmystery.episode.**.entity.*
+  type-aliases-package: com.spmystery.episode.**.entity.**

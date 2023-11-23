@@ -1,5 +1,6 @@
 package com.spmystery.episode.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -25,5 +26,10 @@ public class Token {
         token.setUser(user);
         token.setExpireTime(LocalDateTime.now().plusDays(TOKEN_EXPIRE_DAYS));
         return token;
+    }
+
+    @JsonIgnore
+    public boolean isExpired() {
+        return expireTime == null || expireTime.isBefore(LocalDateTime.now());
     }
 }

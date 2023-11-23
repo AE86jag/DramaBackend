@@ -4,12 +4,16 @@ buildscript {
             url 'http://maven.aliyun.com/nexus/content/groups/public/'
         }
     }
+    dependencies {
+        classpath 'org.flywaydb:flyway-gradle-plugin:5.2.4'
+    }
 }
 
 plugins {
     id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
+    id 'org.flywaydb.flyway' version '5.2.4'
 }
 
 group = 'com.my.template'
@@ -37,7 +41,17 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    //序列化反序列化
     compile 'com.alibaba:fastjson:1.2.28'
+
+    //flyway
+    compile 'org.flywaydb:flyway-core:5.2.4'
+}
+
+flyway{
+    url = "jdbc:mysql://127.0.0.1:3306/drama?useSSL=false&serverTimezone=CTT"
+    user = 'root'
+    password = 'jay-123456!'
 }
 
 test {

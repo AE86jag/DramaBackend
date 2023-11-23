@@ -12,4 +12,6 @@ public interface UserMapper {
     User findByOpenId(String openId);
 
     int findCountByOpenId(String openId);
+
+    int updateById(User user);
 }

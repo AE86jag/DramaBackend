@@ -5,6 +5,7 @@
 
     <resultMap id="BaseResultMap" type="com.spmystery.episode.user.entity.Token">
         <id column="id" property="id"/>
+        <result column="user_id" property="user.id"/>
         <result column="mobile" property="user.mobile"/>
         <result column="nickname" property="user.nickname"/>
         <result column="open_id" property="user.openId"/>
@@ -28,14 +29,17 @@
 
     <insert id="insert" parameterType="Token">
         INSERT INTO token(id, user_id, expire_time)
-        VALUES (#{id}, #{userId}, #{expireTime})
+        VALUES (#{id}, #{user.id}, #{expireTime})
     </insert>
 
     <select id="findById" resultMap="BaseResultMap" parameterType="String">
         SELECT
-        <include refid="BaseColumnList"/>
-        FROM token
-        WHERE id = #{id}
+        t.id, t.user_id, t.expire_time, t.last_modify_time, t.create_time,
+        u.mobile, u.nickname, u.open_id, u.union_id, u.head_img_url, u.province, u.city,
+        u.country, u.sex, u.status, u.invite_user_id
+        FROM token t
+        INNER JOIN `user` u ON t.user_id = u.id
+        WHERE t.id = #{id}
     </select>
 
     <delete id="deleteByUserId" parameterType="String">
