@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spmystery.episode.user.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.spmystery.episode.user.entity.User">
+        <id column="id" property="id"/>
+        <result column="mobile" property="mobile"/>
+        <result column="nickname" property="nickname"/>
+        <result column="open_id" property="openId"/>
+        <result column="union_id" property="unionId"/>
+        <result column="head_img_url" property="headImgUrl"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="country" property="country"/>
+        <result column="sex" property="sex"/>
+        <result column="status" property="status"/>
+        <result column="invite_user_id" property="inviteUserId"/>
+        <result column="last_modify_time" property="lastModifyTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapWithRoles" type="com.spmystery.episode.user.entity.User">
+        <id column="id" property="id"/>
+        <result column="mobile" property="mobile"/>
+        <result column="nickname" property="nickname"/>
+        <result column="open_id" property="openId"/>
+        <result column="union_id" property="unionId"/>
+        <result column="head_img_url" property="headImgUrl"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="country" property="country"/>
+        <result column="sex" property="sex"/>
+        <result column="status" property="status"/>
+        <result column="invite_user_id" property="inviteUserId"/>
+        <result column="last_modify_time" property="lastModifyTime"/>
+        <result column="create_time" property="createTime"/>
+        <collection property="roleIds" javaType="list" ofType="String">
+            <result column="role_id"/>
+        </collection>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, mobile, nickname, open_id, union_id, head_img_url, province, city,
+        country, sex, status, invite_user_id, last_modify_time, create_time
+    </sql>
+
+    <insert id="insert" parameterType="User">
+        INSERT INTO `user`(id, mobile, nickname, open_id, union_id, head_img_url, province,
+        city, country, sex, status, invite_user_id)
+        VALUES
+        (
+        #{id}, #{mobile}, #{nickname}, #{openId}, #{unionId}, #{headImgUrl}, #{province},
+        #{city}, #{country}, #{sex}, #{status}, #{inviteUserId})
+    </insert>
+
+    <select id="findByOpenId" resultMap="BaseResultMap" parameterType="String">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM `user`
+        WHERE open_id = #{openId}
+    </select>
+
+    <select id="findCountByOpenId" resultType="Integer" parameterType="String">
+        SELECT
+        count(1)
+        FROM `user`
+        WHERE open_id = #{openId} AND
+    </select>
+</mapper>
