@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 public class User {
@@ -21,7 +20,9 @@ public class User {
 
     private String headImgUrl;
 
-    private String sex;
+    private Integer sex;
+
+    private Integer level;
 
     /**
      * 用户所在省
@@ -61,5 +62,6 @@ public class User {
         city = user.getCity();
         country = user.getCountry();
         sex = user.getSex();
+        level = 0;
     }
 }

@@ -22,16 +22,16 @@
 
     <sql id="BaseColumnList">
         id, mobile, nickname, open_id, union_id, head_img_url, province, city,
-        country, sex, status, invite_user_id, last_modify_time, create_time
+        country, sex, `level`, status, invite_user_id, last_modify_time, create_time
     </sql>
 
     <insert id="insert" parameterType="User">
         INSERT INTO `user`(id, mobile, nickname, open_id, union_id, head_img_url, province,
-        city, country, sex, status, invite_user_id)
+        city, country, sex, `level`, status, invite_user_id)
         VALUES
         (
         #{id}, #{mobile}, #{nickname}, #{openId}, #{unionId}, #{headImgUrl}, #{province},
-        #{city}, #{country}, #{sex}, #{status}, #{inviteUserId})
+        #{city}, #{country}, #{sex}, #{level}, #{status}, #{inviteUserId})
     </insert>
 
     <select id="findByOpenId" resultMap="BaseResultMap" parameterType="String">
@@ -59,7 +59,8 @@
             city = #{city},
             country = #{country},
             sex = #{sex},
-            status = 1
+            status = 1,
+            `level` = #{level}
         WHERE id = #{id}
     </update>
 </mapper>

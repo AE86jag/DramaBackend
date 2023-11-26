@@ -9,6 +9,7 @@ CREATE TABLE user(
     city VARCHAR(50) COMMENT '市',
     country VARCHAR(50) COMMENT '县',
     sex TINYINT(1) COMMENT '性别, 0:女, 1:男',
+    `level` TINYINT(1) COMMENT '用户等级',
     status TINYINT(1) DEFAULT 1 COMMENT '用户状态, 0:无效, 1:正常',
     invite_user_id VARCHAR(32) COMMENT '邀请用户ID',
     last_modify_time DATETIME NOT NULL DEFAULT NOW() ON UPDATE NOW() COMMENT '最后一次更新时间',

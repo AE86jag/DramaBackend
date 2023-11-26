@@ -14,7 +14,7 @@ public class UserRegisterParam {
 
     private String nickname;
 
-    private String sex;
+    private Integer sex;
 
     private String province;
 
@@ -32,6 +32,7 @@ public class UserRegisterParam {
         user.setProvince(province);
         user.setCity(city);
         user.setCountry(country);
+        user.setLevel(0);
         return user;
     }
 }

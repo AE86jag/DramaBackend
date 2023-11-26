@@ -15,6 +15,7 @@
         <result column="city" property="user.city"/>
         <result column="country" property="user.country"/>
         <result column="sex" property="user.sex"/>
+        <result column="level" property="user.level"/>
         <result column="status" property="user.status"/>
         <result column="invite_user_id" property="user.inviteUserId"/>
         <result column="expire_time" property="expireTime"/>
@@ -36,7 +37,7 @@
         SELECT
         t.id, t.user_id, t.expire_time, t.last_modify_time, t.create_time,
         u.mobile, u.nickname, u.open_id, u.union_id, u.head_img_url, u.province, u.city,
-        u.country, u.sex, u.status, u.invite_user_id
+        u.country, u.sex, u.level, u.status, u.invite_user_id
         FROM token t
         INNER JOIN `user` u ON t.user_id = u.id
         WHERE t.id = #{id}
