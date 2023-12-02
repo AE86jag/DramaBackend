@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spmystery.episode.systemconfig.SystemConfigMapper">
+    <resultMap id="BaseResultMap" type="com.spmystery.episode.systemconfig.SystemConfig">
+        <id column="key" property="key"/>
+        <result column="value" property="value"/>
+        <result column="group" property="group"/>
+        <result column="remark" property="remark"/>
+        <result column="last_modify_time" property="lastModifyTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+
+    <sql id="BaseColumnList">
+        `key`, `value`, `group`, remark, last_modify_time, create_time
+    </sql>
+
+    <select id="findByKey" parameterType="String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM system_config
+        WHERE `key` = #{key}
+    </select>
+
+    <insert id="save" parameterType="SystemConfig">
+        INSERT INTO system_config
+        (`key`, `value`, `group`, remark, last_modify_time, create_time)
+        VALUES (#{key}, #{value}, #{group}, #{remark}, NOW(), NOW())
+    </insert>
+
+    <update id="updateValueByKey" parameterType="SystemConfig">
+        UPDATE system_config
+        SET `value` = #{value}
+        WHERE `key` = #{key}
+    </update>
+
+    <select id="findByGroups" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM system_config
+        WHERE `group` = 'focus'
+        OR `key` IN ('tao-kou-ling', 'wechat-qr-code', 'wechat-number', 'phone-number')
+    </select>
+
+    <select id="findMaxValueOfFocus" resultType="Integer">
+        SELECT MAX(CAST(`key` AS UNSIGNED INTEGER)) FROM system_config WHERE `group` = 'focus'
+    </select>
+
+    <delete id="deleteById" parameterType="String">
+        DELETE FROM system_config
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findFocus" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM system_config
+        WHERE `group` = 'focus'
+        ORDER BY CAST(`key` AS UNSIGNED INTEGER) DESC
+    </select>
+
+
+
+</mapper>

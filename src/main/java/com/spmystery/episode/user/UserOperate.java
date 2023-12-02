@@ -30,6 +30,9 @@ public class UserOperate {
             //TODO 邀请人ID怎么传
             //user.setInviteUserId();
             userMapper.insert(user);
+
+            //删除这个人以前的余额
+
             //进行登录
             return tokenOperate.create(user);
         } else {

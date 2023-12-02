@@ -6,7 +6,6 @@ import com.spmystery.episode.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
 
 @Component
 public class TokenOperate {
@@ -28,6 +27,10 @@ public class TokenOperate {
     public Token getById(String id) {
         //是否过期，过期就删除，并返回401
         Token token = tokenMapper.findById(id);
+        if (token == null) {
+            throw new RuntimeException("Token不存在");
+        }
+
         if (token.isExpired()) {
             //TODO 定义异常
             throw new RuntimeException("已过期");

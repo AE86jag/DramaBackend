@@ -1,5 +1,6 @@
 package com.spmystery.episode.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -46,7 +47,11 @@ public class User {
 
     private Integer status;
 
+    //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+    @JsonIgnore
     private LocalDateTime lastModifyTime;
+    //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+    @JsonIgnore
     private LocalDateTime createTime;
 
     @JsonIgnore

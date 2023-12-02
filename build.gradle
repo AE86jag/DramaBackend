@@ -46,6 +46,12 @@ dependencies {
 
     //flyway
     compile 'org.flywaydb:flyway-core:5.2.4'
+
+    //OKHttp
+    implementation 'com.squareup.okhttp3:okhttp:3.12.3'
+
+    //Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 flyway{

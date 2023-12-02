@@ -1,5 +1,6 @@
 package com.spmystery.episode.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -14,10 +15,16 @@ public class Token {
 
     private User user;
 
+    //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+    @JsonIgnore
     private LocalDateTime expireTime;
 
+   // @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+    @JsonIgnore
     private LocalDateTime lastModifyTime;
 
+    //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+    @JsonIgnore
     private LocalDateTime createTime;
 
     public static Token build(String id, User user) {

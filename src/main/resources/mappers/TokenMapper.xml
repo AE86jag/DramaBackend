@@ -40,7 +40,7 @@
         u.country, u.sex, u.level, u.status, u.invite_user_id
         FROM token t
         INNER JOIN `user` u ON t.user_id = u.id
-        WHERE t.id = #{id}
+        WHERE t.id = #{id} AND u.status = 1
     </select>
 
     <delete id="deleteByUserId" parameterType="String">

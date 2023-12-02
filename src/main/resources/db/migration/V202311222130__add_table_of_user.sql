@@ -4,7 +4,7 @@ CREATE TABLE user(
     nickname VARCHAR(50) COMMENT '微信昵称',
     open_id VARCHAR(50) NOT NULL COMMENT '微信OpenId',
     union_id VARCHAR(50) COMMENT '微信UnionId',
-    head_img_url VARCHAR(100) COMMENT '微信头像地址',
+    head_img_url VARCHAR(500) COMMENT '微信头像地址',
     province VARCHAR(50) COMMENT '省',
     city VARCHAR(50) COMMENT '市',
     country VARCHAR(50) COMMENT '县',

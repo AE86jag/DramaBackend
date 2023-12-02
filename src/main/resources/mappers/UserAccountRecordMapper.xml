@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spmystery.episode.account.mapper.UserAccountRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.spmystery.episode.account.entity.UserAccountRecord">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="chang_type" property="changType"/>
+        <result column="change_message" property="changeMessage"/>
+        <result column="chang_amount" property="changAmount"/>
+        <result column="last_modify_time" property="lastModifyTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+
+    <sql id="BaseColumnList">
+        id, user_id, chang_type, change_message, chang_amount, last_modify_time, create_time
+    </sql>
+
+    <insert id="insert" parameterType="UserAccountRecord">
+        INSERT INTO user_account_record(user_id, chang_type, change_message, chang_amount)
+        VALUES (#{userId}, #{changType}, #{changeMessage}, #{changAmount})
+    </insert>
+
+    <select id="findSumByUserId" resultType="DECIMAL" parameterType="String">
+        SELECT
+        SUM(chang_amount)
+        FROM user_account_record
+        WHERE user_id = #{userId}
+    </select>
+</mapper>
