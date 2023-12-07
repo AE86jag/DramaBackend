@@ -6,6 +6,8 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import static com.spmystery.episode.systemconfig.SystemConfigOperate.*;
+
 @Data
 public class UserAccountRecord {
 
@@ -29,12 +31,22 @@ public class UserAccountRecord {
 
     public enum ChangeType{
         C("提现"),
-        D("看完一集短剧"),
-        A("看完广告"),
-        I("邀请"),
-        R("注册");
+        D("看完一集短剧", USER_WATCHING_ONE_DRAMA),
+        A("看完广告", USER_WATCHING_ADVERTISEMENTS),
+        I("邀请", INVITE_USER_REWARD),
+        R("注册", USER_REGISTER_REWARD);
 
         private String description;
+
+        /**
+         * 对应类型账户积分变动金额配置项key
+         */
+        private String key;
+
+        ChangeType(String description, String key) {
+            this.description = description;
+            this.key = key;
+        }
 
         ChangeType(String description) {
             this.description = description;
@@ -42,6 +54,10 @@ public class UserAccountRecord {
 
         public String getDescription() {
             return description;
+        }
+
+        public String getKey() {
+            return key;
         }
     }
 
@@ -51,5 +67,9 @@ public class UserAccountRecord {
         record.setChangeType(ChangeType.R);
         record.setChangeMessage("新用户注册");
         return record;
+    }
+
+    public boolean isRegister() {
+        return changeType == ChangeType.R;
     }
 }

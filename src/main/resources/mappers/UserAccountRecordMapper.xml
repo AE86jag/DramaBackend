@@ -23,6 +23,12 @@
         VALUES (#{userId}, #{changeType}, #{changeMessage}, #{changeAmount})
     </insert>
 
+    <select id="findCountByUserIdAndType" parameterType="map" resultType="Integer">
+        SELECT count(1)
+        FROM user_account_record
+        WHERE user_id = #{userId} AND change_type = #{changeType}
+    </select>
+
     <select id="findSumByUserId" resultType="DECIMAL" parameterType="String">
         SELECT
         SUM(change_amount)

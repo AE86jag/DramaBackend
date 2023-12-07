@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 public class SystemConfigOperate {
 
     public static final String USER_REGISTER_REWARD = "user_register_reward";
+    public static final String INVITE_USER_REWARD = "invite_user_reward";
+    public static final String USER_WATCHING_ADVERTISEMENTS = "user_watching_advertisements";
+    public static final String USER_WATCHING_ONE_DRAMA = "user_watching_one_drama";
 
     @Autowired
     private SystemConfigMapper systemConfigMapper;

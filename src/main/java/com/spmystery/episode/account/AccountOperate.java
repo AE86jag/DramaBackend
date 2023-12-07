@@ -8,10 +8,10 @@ import com.spmystery.episode.systemconfig.SystemConfigOperate;
 import com.spmystery.episode.util.CurrentUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 
-import static com.spmystery.episode.systemconfig.SystemConfigOperate.USER_REGISTER_REWARD;
 
 @Component
 public class AccountOperate {
@@ -23,11 +23,28 @@ public class AccountOperate {
     private SystemConfigOperate systemConfigOperate;
 
     public void add(UserAccountRecord record) {
-        //TODO 根据类型取配置表里面的数值
-        if (record.getChangeType() == UserAccountRecord.ChangeType.R) {
-            SystemConfig config = systemConfigOperate.findByKey(USER_REGISTER_REWARD);
+        String key = record.getChangeType().getKey();
+        if (StringUtils.isEmpty(key)) {
+            if (record.getChangeAmount() == null || record.getChangeAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                //如果是提现操作，而且传的变更金额为空或者提现金额
+                throw new RuntimeException("金额参数异常");
+            }
+            //提现取金额相反数, 外面传的参数是正数
+            record.setChangeAmount(record.getChangeAmount().negate());
+        } else {
+            //除了提现其他类型的都是使用系统配置的金额
+            SystemConfig config = systemConfigOperate.findByKey(key);
             record.setChangeAmount(new BigDecimal(config.getValue()));
         }
+
+        if (record.isRegister()) {
+            //注册一个人只能加一次积分
+            int count = userAccountRecordMapper.findCountByUserIdAndType(record.getUserId(), record.getChangeType());
+            if (count > 0) {
+                throw new RuntimeException("注册加积分已达上限");
+            }
+        }
+
         userAccountRecordMapper.insert(record);
     }
 
