@@ -1,7 +1,10 @@
 package com.spmystery.episode.user;
 
+import com.spmystery.episode.account.AccountOperate;
+import com.spmystery.episode.account.entity.UserAccountRecord;
 import com.spmystery.episode.user.entity.Token;
 import com.spmystery.episode.user.entity.User;
+import com.spmystery.episode.user.entity.UserRole;
 import com.spmystery.episode.user.mapper.TokenOperate;
 import com.spmystery.episode.user.mapper.UserMapper;
 import com.spmystery.episode.util.StringUtil;
@@ -18,30 +21,29 @@ public class UserOperate {
     @Autowired
     private TokenOperate tokenOperate;
 
+    @Autowired
+    private AccountOperate accountOperate;
+
     @Transactional
     public Token register(User user) {
         //删除以前的Token, 只能单点登录，防止刷余额
         tokenOperate.delete(user.getId());
 
         User existUser = userMapper.findByOpenId(user.getOpenId());
-        if (existUser == null) {
-            user.setId(StringUtil.generateId());
-            user.setStatus(1);
-            //TODO 邀请人ID怎么传
-            //user.setInviteUserId();
-            userMapper.insert(user);
-
-            //删除这个人以前的余额
-
-            //进行登录
-            return tokenOperate.create(user);
-        } else {
-            //更新用户信息
-            existUser.update(user);
-            userMapper.updateById(existUser);
-
-            //进行登录
-            return tokenOperate.create(existUser);
+        if (existUser != null) {
+            throw new RuntimeException("用户状态异常, 请重试");
         }
+        user.setId(StringUtil.generateId());
+        user.setStatus(1);
+        //TODO 邀请人ID怎么传
+        //user.setInviteUserId();
+        userMapper.insert(user);
+        userMapper.insertUserRole(UserRole.build(user.getId()));
+
+        accountOperate.add(UserAccountRecord.buildRegisterRecord(user.getId()));
+
+        //进行登录
+        return tokenOperate.create(user);
+
     }
 }

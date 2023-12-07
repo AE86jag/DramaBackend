@@ -13,11 +13,11 @@ public class UserAccountRecord {
 
     private String userId;
 
-    private ChangType changType;
+    private ChangeType changeType;
 
     private String changeMessage;
 
-    private BigDecimal changAmount;
+    private BigDecimal changeAmount;
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 
@@ -27,7 +27,7 @@ public class UserAccountRecord {
     private LocalDateTime createTime;
 
 
-    public enum ChangType{
+    public enum ChangeType{
         C("提现"),
         D("看完一集短剧"),
         A("看完广告"),
@@ -36,12 +36,20 @@ public class UserAccountRecord {
 
         private String description;
 
-        ChangType(String description) {
+        ChangeType(String description) {
             this.description = description;
         }
 
         public String getDescription() {
             return description;
         }
+    }
+
+    public static UserAccountRecord buildRegisterRecord(String userId) {
+        UserAccountRecord record = new UserAccountRecord();
+        record.setUserId(userId);
+        record.setChangeType(ChangeType.R);
+        record.setChangeMessage("新用户注册");
+        return record;
     }
 }

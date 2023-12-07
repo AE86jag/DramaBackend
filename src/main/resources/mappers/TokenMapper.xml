@@ -5,22 +5,27 @@
 
     <resultMap id="BaseResultMap" type="com.spmystery.episode.user.entity.Token">
         <id column="id" property="id"/>
-        <result column="user_id" property="user.id"/>
-        <result column="mobile" property="user.mobile"/>
-        <result column="nickname" property="user.nickname"/>
-        <result column="open_id" property="user.openId"/>
-        <result column="union_id" property="user.unionId"/>
-        <result column="head_img_url" property="user.headImgUrl"/>
-        <result column="province" property="user.province"/>
-        <result column="city" property="user.city"/>
-        <result column="country" property="user.country"/>
-        <result column="sex" property="user.sex"/>
-        <result column="level" property="user.level"/>
-        <result column="status" property="user.status"/>
-        <result column="invite_user_id" property="user.inviteUserId"/>
         <result column="expire_time" property="expireTime"/>
         <result column="last_modify_time" property="lastModifyTime"/>
         <result column="create_time" property="createTime"/>
+        <association property="user" javaType="com.spmystery.episode.user.entity.User">
+            <result column="user_id" property="id"/>
+            <result column="mobile" property="mobile"/>
+            <result column="nickname" property="nickname"/>
+            <result column="open_id" property="openId"/>
+            <result column="union_id" property="unionId"/>
+            <result column="head_img_url" property="headImgUrl"/>
+            <result column="province" property="province"/>
+            <result column="city" property="city"/>
+            <result column="country" property="country"/>
+            <result column="sex" property="sex"/>
+            <result column="level" property="level"/>
+            <result column="status" property="status"/>
+            <result column="invite_user_id" property="inviteUserId"/>
+            <collection property="roleIds" javaType="java.util.List" ofType="java.lang.String">
+                <result column="role_id"/>
+            </collection>
+        </association>
     </resultMap>
 
 
@@ -37,9 +42,11 @@
         SELECT
         t.id, t.user_id, t.expire_time, t.last_modify_time, t.create_time,
         u.mobile, u.nickname, u.open_id, u.union_id, u.head_img_url, u.province, u.city,
-        u.country, u.sex, u.level, u.status, u.invite_user_id
+        u.country, u.sex, u.level, u.status, u.invite_user_id,
+        ur.role_id
         FROM token t
         INNER JOIN `user` u ON t.user_id = u.id
+        INNER JOIN `user_role` ur ON u.id = ur.user_id
         WHERE t.id = #{id} AND u.status = 1
     </select>
 

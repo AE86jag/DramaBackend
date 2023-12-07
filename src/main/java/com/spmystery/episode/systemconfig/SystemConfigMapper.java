@@ -1,5 +1,6 @@
 package com.spmystery.episode.systemconfig;
 
+import com.spmystery.episode.systemconfig.entity.SystemConfig;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

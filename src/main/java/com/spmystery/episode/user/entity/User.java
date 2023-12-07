@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class User {
@@ -46,6 +47,8 @@ public class User {
     private String inviteUserId;
 
     private Integer status;
+
+    private List<String> roleIds;
 
     //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @JsonIgnore

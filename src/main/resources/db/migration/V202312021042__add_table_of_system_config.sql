@@ -7,3 +7,4 @@ CREATE TABLE system_config(
     create_time DATETIME DEFAULT NOW() NOT NULL COMMENT '创建时间',
     PRIMARY KEY(`key`)
 ) COMMENT = '系统配置表';
+INSERT INTO system_config(`key`, `value`, `group`, `remark`) VALUES('user_register_reward', '90', 'register', '用户注册');

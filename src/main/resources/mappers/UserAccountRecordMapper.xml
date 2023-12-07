@@ -6,26 +6,26 @@
     <resultMap id="BaseResultMap" type="com.spmystery.episode.account.entity.UserAccountRecord">
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
-        <result column="chang_type" property="changType"/>
+        <result column="chang_type" property="changeType"/>
         <result column="change_message" property="changeMessage"/>
-        <result column="chang_amount" property="changAmount"/>
+        <result column="chang_amount" property="changeAmount"/>
         <result column="last_modify_time" property="lastModifyTime"/>
         <result column="create_time" property="createTime"/>
     </resultMap>
 
 
     <sql id="BaseColumnList">
-        id, user_id, chang_type, change_message, chang_amount, last_modify_time, create_time
+        id, user_id, change_type, change_message, change_amount, last_modify_time, create_time
     </sql>
 
     <insert id="insert" parameterType="UserAccountRecord">
-        INSERT INTO user_account_record(user_id, chang_type, change_message, chang_amount)
-        VALUES (#{userId}, #{changType}, #{changeMessage}, #{changAmount})
+        INSERT INTO user_account_record(user_id, change_type, change_message, change_amount)
+        VALUES (#{userId}, #{changeType}, #{changeMessage}, #{changeAmount})
     </insert>
 
     <select id="findSumByUserId" resultType="DECIMAL" parameterType="String">
         SELECT
-        SUM(chang_amount)
+        SUM(change_amount)
         FROM user_account_record
         WHERE user_id = #{userId}
     </select>

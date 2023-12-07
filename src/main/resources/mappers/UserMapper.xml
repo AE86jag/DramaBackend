@@ -18,6 +18,9 @@
         <result column="invite_user_id" property="inviteUserId"/>
         <result column="last_modify_time" property="lastModifyTime"/>
         <result column="create_time" property="createTime"/>
+        <collection property="roleIds" javaType="String">
+            <result column="role_id"/>
+        </collection>
     </resultMap>
 
     <sql id="BaseColumnList">
@@ -34,11 +37,18 @@
         #{city}, #{country}, #{sex}, #{level}, #{status}, #{inviteUserId})
     </insert>
 
+    <insert id="insertUserRole" parameterType="UserRole">
+        INSERT INTO user_role(user_id, role_id) VALUES(#{userId}, #{roleId})
+    </insert>
+
     <select id="findByOpenId" resultMap="BaseResultMap" parameterType="String">
         SELECT
-        <include refid="BaseColumnList"/>
-        FROM `user`
-        WHERE open_id = #{openId}
+        u.id, u.mobile, u.nickname, u.open_id, u.union_id, u.head_img_url, u.province, u.city,
+        u.country, u.sex, u.`level`, u.status, u.invite_user_id, u.last_modify_time, u.create_time,
+        ur.role_id
+        FROM `user` u
+        LEFT JOIN `user_role` ur ON u.id = ur.user_id
+        WHERE u.open_id = #{openId}
     </select>
 
     <select id="findCountByOpenId" resultType="Integer" parameterType="String">

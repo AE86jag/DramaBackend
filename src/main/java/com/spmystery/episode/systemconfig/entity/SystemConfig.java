@@ -1,4 +1,4 @@
-package com.spmystery.episode.systemconfig;
+package com.spmystery.episode.systemconfig.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

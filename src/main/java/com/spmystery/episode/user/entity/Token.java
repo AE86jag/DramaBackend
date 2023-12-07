@@ -1,13 +1,17 @@
 package com.spmystery.episode.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Data
-public class Token {
+public class Token implements Authentication {
 
     public static final int TOKEN_EXPIRE_DAYS = 15;
 
@@ -38,5 +42,44 @@ public class Token {
     @JsonIgnore
     public boolean isExpired() {
         return expireTime == null || expireTime.isBefore(LocalDateTime.now());
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+
+        if (user != null && user.getRoleIds() != null) {
+            return user.getRoleIds().stream().map( r -> (GrantedAuthority) () -> r).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public Object getCredentials() {
+        return null;
+    }
+
+    @Override
+    public Object getDetails() {
+        return null;
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return null;
+    }
+
+    @Override
+    public boolean isAuthenticated() {
+        return true;
+    }
+
+    @Override
+    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+
+    }
+
+    @Override
+    public String getName() {
+        return "TokenAuthentication";
     }
 }
