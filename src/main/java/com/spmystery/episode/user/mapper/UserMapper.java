@@ -14,7 +14,11 @@ public interface UserMapper {
 
     User findByOpenId(String openId);
 
+    User findById(String id);
+
     int findCountByOpenId(String openId);
 
     int updateById(User user);
+
+    int updateWatchAdCountsById(String id);
 }

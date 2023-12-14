@@ -22,4 +22,10 @@ public class AccountController {
     public Object getUserAccountBalance() {
         return accountOperate.getUserBalance();
     }
+
+    @PostMapping("/cash-out/application")
+    @PreAuthorize("hasAnyRole('APP_NORMAL', 'APP_ADMIN')")
+    public Object cashOutApplication(@RequestBody CashOutApplicationParam param) {
+        return null;
+    }
 }

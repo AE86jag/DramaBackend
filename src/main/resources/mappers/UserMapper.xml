@@ -15,6 +15,7 @@
         <result column="country" property="country"/>
         <result column="sex" property="sex"/>
         <result column="status" property="status"/>
+        <result column="watch_ad_counts" property="watchAdCounts"/>
         <result column="invite_user_id" property="inviteUserId"/>
         <result column="last_modify_time" property="lastModifyTime"/>
         <result column="create_time" property="createTime"/>
@@ -25,16 +26,16 @@
 
     <sql id="BaseColumnList">
         id, mobile, nickname, open_id, union_id, head_img_url, province, city,
-        country, sex, `level`, status, invite_user_id, last_modify_time, create_time
+        country, sex, `level`, status, watch_ad_counts, invite_user_id, last_modify_time, create_time
     </sql>
 
     <insert id="insert" parameterType="User">
         INSERT INTO `user`(id, mobile, nickname, open_id, union_id, head_img_url, province,
-        city, country, sex, `level`, status, invite_user_id)
+        city, country, sex, `level`, status, watch_ad_counts, invite_user_id)
         VALUES
         (
         #{id}, #{mobile}, #{nickname}, #{openId}, #{unionId}, #{headImgUrl}, #{province},
-        #{city}, #{country}, #{sex}, #{level}, #{status}, #{inviteUserId})
+        #{city}, #{country}, #{sex}, #{level}, #{status}, #{watchAdCounts} #{inviteUserId})
     </insert>
 
     <insert id="insertUserRole" parameterType="UserRole">
@@ -44,7 +45,7 @@
     <select id="findByOpenId" resultMap="BaseResultMap" parameterType="String">
         SELECT
         u.id, u.mobile, u.nickname, u.open_id, u.union_id, u.head_img_url, u.province, u.city,
-        u.country, u.sex, u.`level`, u.status, u.invite_user_id, u.last_modify_time, u.create_time,
+        u.country, u.sex, u.`level`, u.status, u.watch_ad_counts, u.invite_user_id, u.last_modify_time, u.create_time,
         ur.role_id
         FROM `user` u
         LEFT JOIN `user_role` ur ON u.id = ur.user_id
@@ -73,4 +74,18 @@
             `level` = #{level}
         WHERE id = #{id}
     </update>
+
+    <update id="updateWatchAdCountsById" parameterType="String">
+        UPDATE
+            `user`
+        SET watch_ad_counts = watch_ad_counts + 1
+        WHERE id = #{id}
+    </update>
+
+    <select id="findById" resultMap="BaseResultMap" parameterType="String">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM `user`
+        WHERE id = #{id}
+    </select>
 </mapper>

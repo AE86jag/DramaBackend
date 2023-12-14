@@ -20,9 +20,14 @@
 #### 提现
 一天只能提现一次
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+#### 短剧
+短剧回调参数
+{video_duration=115, video_height=960, script_author=, video_width=540, index=1, 
+title=神医的绝代双娇, type=都市, script_name=, total=60, video_size=9171771, 
+group_id=7264515034716684861, cover_image=https://content.volccdn.com/obj/feedcoop/skit/0547.jpg, drama_id=547, status=0, 
+desc=李不凡学得一身好医术，下山行医并完成所指配的婚约。李不凡辗转至唐家，却意外卷入唐家双胞胎姐妹的争夺漩涡之中。在面临选择的同时，李不凡意外发现当年陷害自己父亲的人也逐渐浮出水面。看少年神医如何救治唐家众人，替父报仇的同时收获爱情。}
+
+
 
 #### 使用说明
 

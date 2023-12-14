@@ -8,6 +8,7 @@
         <result column="user_id" property="userId"/>
         <result column="amount" property="amount"/>
         <result column="status" property="status"/>
+        <result column="level" property="level"/>
         <result column="approve_user_id" property="approveUserId"/>
         <result column="approve_user_name" property="approveUserName"/>
         <result column="approve_time" property="approveTime"/>
@@ -17,13 +18,13 @@
     </resultMap>
 
     <sql id="BaseColumnList">
-        id, user_id, amount, status, approve_user_id, approve_user_name, approve_time, reject_reason, last_modify_time, create_time
+        id, user_id, amount, `status`, `level`, approve_user_id, approve_user_name, approve_time, reject_reason, last_modify_time, create_time
     </sql>
 
     <insert id="insert" parameterType="UserCashOutAccountApplication">
         INSERT INTO user_cash_out_account_application
-        (user_id, amount, status, approve_user_id, approve_user_name, approve_time, reject_reason)
-        VALUES (#{userId}, #{amount}, #{status}, #{approveUserId}, #{approveUserName}, #{approveTime}, #{reject_reason})
+        (user_id, amount, `status`, `level`, approve_user_id, approve_user_name, approve_time, reject_reason)
+        VALUES (#{userId}, #{amount}, #{status}, #{level}, #{approveUserId}, #{approveUserName}, #{approveTime}, #{reject_reason})
     </insert>
 
     <select id="findByUserId" resultMap="BaseResultMap" parameterType="String">
@@ -38,11 +39,46 @@
         UPDATE
             user_cash_out_account_application
         SET
-            status = #{status},
+            `status` = #{status},
             approve_user_id = #{approveUserId},
             approve_user_name = #{approveUserName},
             approve_time = #{approveTime},
             reject_reason = #{rejectReason}
         WHERE id = #{id}
     </update>
+
+    <select id="findCountByUserIdAndStatus" parameterType="map" resultType="Integer">
+        SELECT count(*)
+        FROM user_cash_out_account_application
+        WHERE user_id = #{userId}
+        <choose>
+            <when test="statuses != null and statuses.size() > 0">
+                `status` IN
+                <foreach collection="statuses" separator="," open="(" close=")" item="status">
+                    #{status}
+                </foreach>
+            </when>
+            <otherwise>
+                1 = 2
+            </otherwise>
+        </choose>
+        AND DATE(create_time) = CURDATE();
+    </select>
+
+    <select id="findCountByUserIdAndLevel" parameterType="map" resultType="Integer">
+        SELECT count(*)
+        FROM user_cash_out_account_application
+        WHERE user_id = #{userId}
+        AND `status` IN(0, 1)
+        AND `level` =#{level}
+        AND DATE(create_time) = CURDATE();
+    </select>
+
+    <select id="findSumInDoingByUserId" parameterType="String" resultType="decimal">
+        SELECT SUM(amount)
+        FROM user_cash_out_account_application
+        WHERE user_id = #{userId}
+        AND `status` = 0
+    </select>
+
 </mapper>

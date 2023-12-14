@@ -48,6 +48,8 @@ public class User {
 
     private Integer status;
 
+    private Integer watchAdCounts;
+
     private List<String> roleIds;
 
     //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")

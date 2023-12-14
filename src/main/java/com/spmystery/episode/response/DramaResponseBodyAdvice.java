@@ -1,6 +1,7 @@
 package com.spmystery.episode.response;
 
 
+import com.spmystery.episode.exception.DramaException;
 import com.spmystery.episode.response.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -38,7 +39,14 @@ public class DramaResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     public CommonResponse<Object> exceptionHandler(Exception e){
         log.error(e.getMessage(), e);
         CommonResponse<Object> response = new CommonResponse<>();
-        response.setCode("D999");
+        if (e instanceof DramaException) {
+            DramaException e1 = (DramaException) e;
+            response.setCode(e1.getCode());
+            response.setErrorMessage(e1.getMessage());
+            return response;
+        }
+
+        response.setCode("DN999");
         response.setErrorMessage(e.getMessage());
         return response;
     }

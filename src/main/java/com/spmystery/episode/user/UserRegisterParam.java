@@ -33,6 +33,7 @@ public class UserRegisterParam {
         user.setCity(city);
         user.setCountry(country);
         user.setLevel(0);
+        user.setWatchAdCounts(0);
         return user;
     }
 }

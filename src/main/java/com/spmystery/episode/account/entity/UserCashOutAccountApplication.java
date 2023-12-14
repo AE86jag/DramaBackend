@@ -11,6 +11,7 @@ public class UserCashOutAccountApplication {
     private Integer id;
     private String userId;
     private BigDecimal amount;
+    private Integer level;
     private Integer status;
     private String approveUserId;
     private String approveUserName;
