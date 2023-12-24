@@ -3,6 +3,7 @@ package com.spmystery.episode.account.cashout;
 import com.spmystery.episode.account.AccountOperate;
 import com.spmystery.episode.account.mapper.UserCashOutAccountApplicationMapper;
 import com.spmystery.episode.config.CacheLoadRunner;
+import com.spmystery.episode.drama.mapper.UserWatchDramaRecordMapper;
 import com.spmystery.episode.exception.DramaException;
 import com.spmystery.episode.systemconfig.SystemConfigOperate;
 import com.spmystery.episode.systemconfig.entity.CashOutCondition;
@@ -38,6 +39,9 @@ public class ConfigCashOutLimitation {
     @Autowired
     private AccountOperate accountOperate;
 
+    @Autowired
+    private UserWatchDramaRecordMapper userWatchDramaRecordMapper;
+
     /** [{
      *   "level": 1,
      *   "amount": 0.3  提现金额 + 在途金额 不能大于余额
@@ -51,14 +55,21 @@ public class ConfigCashOutLimitation {
      */
     public boolean canCashOut(CashOutCondition condition) {
         String userId = CurrentUserUtil.currentUserId();
+        //TODO 是否实名认证
+        //TODO 是否绑定提现账户
+        //TODO 可能修改过，缓存中的提现级别在数据库中没有（刷新缓存时，有用户查询，没有做并发控制情况下）
+
         //判断用户等级是否要求
-        User user = userOperate.getById(userId);
-        Integer watchAdCounts = user.getWatchAdCounts();
-        Integer addCountsPerLevel = systemConfigOperate.findIntegerByKey(NEED_AD_COUNTS_PER_LEVEL);
-        Integer userCurrentLevel = watchAdCounts / addCountsPerLevel;
-        if (userCurrentLevel < condition.getUserLevel()) {
-            throw new DramaException(DO004);
+        if (condition.getUserLevel() > 0) {
+            User user = userOperate.getById(userId);
+            Integer watchAdCounts = user.getWatchAdCounts();
+            Integer addCountsPerLevel = systemConfigOperate.findIntegerByKey(NEED_AD_COUNTS_PER_LEVEL);
+            Integer userCurrentLevel = watchAdCounts / addCountsPerLevel;
+            if (userCurrentLevel < condition.getUserLevel()) {
+                throw new DramaException(DO004);
+            }
         }
+
 
         //判断用户当天该等级提现次数是否超过当前等级的提现次数上限
         int hasCashOutCount =
@@ -90,8 +101,15 @@ public class ConfigCashOutLimitation {
 
 
         //观看不同视频的次数，用户观看短剧
-        //判断提现次数
-        //查询
+        int differentDramaCount = userWatchDramaRecordMapper.findCountByUserId(userId);
+        if (differentDramaCount < condition.getWatchNumber()) {
+            throw new DramaException(DO008, condition.getWatchNumber(), differentDramaCount);
+        }
+
+        //判断观看整部短剧数量是否符合要求
+        if (condition.getDramaCount() > 0) {
+
+        }
         return true;
     }
 

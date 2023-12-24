@@ -16,6 +16,18 @@ public class DramaException extends RuntimeException {
         this.message = iErrorCode.getErrorMessage();
     }
 
+    public DramaException(IErrorCode iErrorCode, Object param) {
+        super(String.format(iErrorCode.getCode() + "-" + iErrorCode.getErrorMessage(), param));
+        this.code = iErrorCode.getCode();
+        this.message = iErrorCode.getErrorMessage();
+    }
+
+    public DramaException(IErrorCode iErrorCode, Object param1, Object param2) {
+        super(String.format(iErrorCode.getCode() + "-" + iErrorCode.getErrorMessage(), param1, param2));
+        this.code = iErrorCode.getCode();
+        this.message = iErrorCode.getErrorMessage();
+    }
+
     public String getCode() {
         return code;
     }

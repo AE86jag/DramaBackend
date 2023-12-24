@@ -12,8 +12,5 @@ public interface UserWatchDramaRecordMapper {
 
     int insert(UserAccountRecord userAccountRecord);
 
-    BigDecimal findSumByUserId(String userId);
-
-    int findCountByUserIdAndType(@Param("userId") String userId,
-                                 @Param("changeType") UserAccountRecord.ChangeType changeType);
+    int findCountByUserId(String userId);
 }

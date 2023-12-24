@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,14 @@ public class CacheLoadRunner implements CommandLineRunner {
 
     public static CashOutCondition getByLevel(Integer level) {
         return cashOutConditionCache.get(level);
+    }
+
+    public static List<CashOutCondition> getAll() {
+        List<CashOutCondition> cashOutConditions = new ArrayList<>();
+        cashOutConditionCache.forEach((key, value) -> {
+            cashOutConditions.add(value);
+        });
+        return cashOutConditions;
     }
 
     //TODO 线程安全的问题，刷新后，上面查询的方法还是查的旧的

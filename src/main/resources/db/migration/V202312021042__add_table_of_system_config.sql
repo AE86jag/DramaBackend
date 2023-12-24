@@ -1,6 +1,6 @@
 CREATE TABLE system_config(
     `key` VARCHAR(50) UNIQUE NOT NULL COMMENT '参数键',
-    `value` VARCHAR(100) COMMENT '参数值',
+    `value` VARCHAR(1000) COMMENT '参数值',
     `group` VARCHAR(50) COMMENT '键值对所属组',
     `remark` VARCHAR(100) COMMENT '参数备注',
     last_modify_time DATETIME NOT NULL DEFAULT NOW() ON UPDATE NOW() COMMENT '最后一次更新时间',

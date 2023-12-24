@@ -21,4 +21,9 @@
         INSERT INTO user_watch_drama_record(user_id, drama_id, drama_index)
         VALUES (#{userId}, #{dramaId}, #{dramaIndex})
     </insert>
+
+    <select id="findCountByUserId" parameterType="String" resultType="Integer">
+        SELECT count(DISTINCT drama_id, drama_index) FROM user_watch_drama_record
+        WHERE user_id = #{userId}
+    </select>
 </mapper>
