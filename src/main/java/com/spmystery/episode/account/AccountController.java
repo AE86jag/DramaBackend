@@ -2,11 +2,13 @@ package com.spmystery.episode.account;
 
 import com.spmystery.episode.account.entity.UserAccountRecord;
 import com.spmystery.episode.config.CacheLoadRunner;
+import com.spmystery.episode.response.CommonResponse;
 import com.spmystery.episode.systemconfig.entity.CashOutCondition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,9 +37,14 @@ public class AccountController {
     }
 
     @PostMapping("/cash-out/application")
-    @PreAuthorize("hasAnyRole('APP_NORMAL', 'APP_ADMIN')")
-    public Object cashOutApplication(@RequestBody CashOutApplicationParam param) {
-        return null;
+    //@PreAuthorize("hasAnyRole('APP_NORMAL', 'APP_ADMIN')")
+    public CommonResponse cashOutApplication(@RequestBody CashOutApplicationParam param, HttpServletRequest request) {
+        System.out.println(request.getHeader("Token"));
+        System.out.println(param);
+        if (param.getLevel() > 3) {
+            throw new RuntimeException("提现金额过大");
+        }
+        return CommonResponse.build(null);
     }
 
     @GetMapping("/record")
@@ -69,13 +76,9 @@ public class AccountController {
     }
 
     @GetMapping("/cash-out-amount/config")
-    public List<Map<String, Object>> getCashOutAmountConfig() {
+    public List<CashOutConfigItem> getCashOutAmountConfig() {
         List<CashOutCondition> all = CacheLoadRunner.getAll();
-        return all.stream().map(a -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("level", a.getLevel());
-            map.put("amount", a.getAmount().toString());
-            return map;
-        }).collect(Collectors.toList());
+        return all.stream().map(a -> CashOutConfigItem.from(a.getLevel(), a.getAmount().toString()))
+                .collect(Collectors.toList());
     }
 }

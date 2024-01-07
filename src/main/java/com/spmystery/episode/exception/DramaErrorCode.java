@@ -21,7 +21,8 @@ public enum DramaErrorCode implements IErrorCode {
 
     //用户相关, 第二位是U
     DU001("用户不存在"),
-    DU002("用户已失效")
+    DU002("用户已失效"),
+    DU003("用户已绑定提现账户")
     ;
 
     DramaErrorCode(String message) {

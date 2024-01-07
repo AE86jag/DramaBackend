@@ -14,8 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.spmystery.episode.exception.DramaErrorCode.DU001;
-import static com.spmystery.episode.exception.DramaErrorCode.DU002;
+import static com.spmystery.episode.exception.DramaErrorCode.*;
 
 @Component
 public class UserOperate {
@@ -42,6 +41,9 @@ public class UserOperate {
         user.setStatus(1);
         //TODO 邀请人ID怎么传
         //user.setInviteUserId();
+        System.out.println("---------------");
+        System.out.println(user);
+        System.out.println("---------------");
         userMapper.insert(user);
         userMapper.insertUserRole(UserRole.build(user.getId()));
 
@@ -68,5 +70,19 @@ public class UserOperate {
         }
 
         return user;
+    }
+
+    public void bindCashOutAccount(String alipayAccount, String alipayAccountName) {
+        String userId = CurrentUserUtil.currentUserId();
+        User user = userMapper.findById(userId);
+        if (user.isBindCashOutAccount()) {
+            throw new DramaException(DU003);
+        }
+
+        userMapper.updateAccountAndNameById(userId, alipayAccount, alipayAccountName);
+    }
+
+    public User getUserByOpenId(String openId) {
+        return userMapper.findByOpenId(openId);
     }
 }

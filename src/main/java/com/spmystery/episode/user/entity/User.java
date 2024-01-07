@@ -2,6 +2,7 @@ package com.spmystery.episode.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.spmystery.episode.util.StringUtil;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -50,6 +51,10 @@ public class User {
 
     private Integer watchAdCounts;
 
+    private String alipayAccount;
+
+    private String alipayAccountName;
+
     private List<String> roleIds;
 
     //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
@@ -64,14 +69,7 @@ public class User {
         return status != null && status.equals(1);
     }
 
-    public void update(User user) {
-        nickname = user.getNickname();
-        headImgUrl = user.getHeadImgUrl();
-        unionId = user.getUnionId();
-        province = user.getProvince();
-        city = user.getCity();
-        country = user.getCountry();
-        sex = user.getSex();
-        level = 0;
+    public boolean isBindCashOutAccount() {
+        return StringUtil.isNotEmpty(alipayAccount) && StringUtil.isNotEmpty(alipayAccountName);
     }
 }

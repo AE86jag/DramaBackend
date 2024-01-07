@@ -13,6 +13,8 @@ CREATE TABLE user(
     status TINYINT(1) DEFAULT 1 COMMENT '用户状态, 0:无效, 1:正常',
     watch_ad_counts INT(11) NOT NULL DEFAULT 0 COMMENT '用户看广告的次数，用户等级基于这个字段',
     invite_user_id VARCHAR(32) COMMENT '邀请用户ID',
+    alipay_account VARCHAR(100) COMMENT '支付宝账户',
+    alipay_account_name VARCHAR(100) COMMENT '支付宝收款账户名',
     last_modify_time DATETIME NOT NULL DEFAULT NOW() ON UPDATE NOW() COMMENT '最后一次更新时间',
     create_time DATETIME DEFAULT NOW() NOT NULL COMMENT '创建时间',
     PRIMARY KEY(`id`)
