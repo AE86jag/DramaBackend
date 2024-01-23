@@ -26,6 +26,11 @@
         </collection>
     </resultMap>
 
+    <resultMap id="DramaTotal" type="com.spmystery.episode.user.entity.DramaTotal">
+        <result column="sum" property="sum"/>
+        <result column="drama_id" property="id"/>
+    </resultMap>
+
     <sql id="BaseColumnList">
         id, mobile, nickname, open_id, union_id, head_img_url, province, city,
         country, sex, `level`, status, watch_ad_counts, invite_user_id, alipay_account,
@@ -97,4 +102,18 @@
         SET alipay_account = #{alipayAccount}, alipay_account_name = #{alipayAccountName}
         WHERE id = #{id}
     </update>
+
+    <select id="findDistinctDramaIdById" parameterType="String" resultType="Long">
+        SELECT DISTINCT drama_id
+        FROM user_watch_drama_record
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="findWatchRecordByUserId" parameterType="String" resultMap="DramaTotal">
+        SELECT SUM(drama_index) `sum`, drama_id
+        FROM user_watch_drama_record
+        WHERE user_id = #{userId}
+        GROUP BY drama_id
+    </select>
+
 </mapper>

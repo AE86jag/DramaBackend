@@ -2,7 +2,11 @@ package com.spmystery.episode.user;
 
 import com.spmystery.episode.account.AccountOperate;
 import com.spmystery.episode.account.entity.UserAccountRecord;
+import com.spmystery.episode.drama.entity.UserWatchDramaRecord;
+import com.spmystery.episode.drama.mapper.UserWatchDramaRecordMapper;
 import com.spmystery.episode.exception.DramaException;
+import com.spmystery.episode.systemconfig.SystemConfigOperate;
+import com.spmystery.episode.user.entity.DramaTotal;
 import com.spmystery.episode.user.entity.Token;
 import com.spmystery.episode.user.entity.User;
 import com.spmystery.episode.user.entity.UserRole;
@@ -10,13 +14,21 @@ import com.spmystery.episode.user.mapper.TokenOperate;
 import com.spmystery.episode.user.mapper.UserMapper;
 import com.spmystery.episode.util.CurrentUserUtil;
 import com.spmystery.episode.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static com.spmystery.episode.exception.DramaErrorCode.*;
+import static com.spmystery.episode.systemconfig.SystemConfigOperate.NEED_AD_COUNTS_PER_LEVEL;
 
 @Component
+@Slf4j
 public class UserOperate {
 
     @Autowired
@@ -27,6 +39,12 @@ public class UserOperate {
 
     @Autowired
     private AccountOperate accountOperate;
+
+    @Autowired
+    private SystemConfigOperate systemConfigOperate;
+
+    @Autowired
+    private UserWatchDramaRecordMapper userWatchDramaRecordMapper;
 
     @Transactional
     public Token register(User user) {
@@ -55,6 +73,9 @@ public class UserOperate {
     }
 
     public void addUserAdCount() {
+        if (!CurrentUserUtil.isLogin()) {
+            return;
+        }
         String userId = CurrentUserUtil.currentUserId();
         userMapper.updateWatchAdCountsById(userId);
     }
@@ -84,5 +105,63 @@ public class UserOperate {
 
     public User getUserByOpenId(String openId) {
         return userMapper.findByOpenId(openId);
+    }
+
+    public List<Long> getUserWatchedDrama() {
+        return userMapper.findDistinctDramaIdById(CurrentUserUtil.currentUserId());
+    }
+
+    public Map<Long, Integer> getUserWatchRecordGroubyDramaId() {
+        List<DramaTotal> watchRecord = userMapper.findWatchRecordByUserId(CurrentUserUtil.currentUserId());
+        Map<Long, Integer> result = new HashMap<>();
+        if (watchRecord == null) {
+            return result;
+        }
+
+        for (DramaTotal dramaTotal : watchRecord) {
+            result.put(dramaTotal.getId(), dramaTotal.getSum());
+        }
+        return result;
+    }
+
+    public boolean isBindCashOutAccount() {
+        User user = getById(CurrentUserUtil.currentUserId());
+        return user.isBindCashOutAccount();
+    }
+
+    public CashOutBindAccount getUserCashOutBindAccount() {
+        User user = getById(CurrentUserUtil.currentUserId());
+        return user.toCashOutBindAccount();
+    }
+
+    @Transactional
+    public void watchDrama(UserWatchDramaParam param) {
+        if (!CurrentUserUtil.isLogin()) {
+            return;
+        }
+
+        String userId = CurrentUserUtil.currentUserId();
+        int count = userWatchDramaRecordMapper.findByKey(userId, param.getDramaId(), param.getDramaIndex());
+        if (count > 0) {
+            log.info("duplicate watch");
+            return;
+        }
+
+        //加观看记录
+        UserWatchDramaRecord record = param.toUserWatchDramaRecord(userId);
+        userWatchDramaRecordMapper.insert(record);
+
+        //加积分
+        Integer userLevel = getUserLevel(userId);
+        double amount = Math.random() * userLevel * 10;
+        UserAccountRecord accountRecord = param.toUserAccountRecord(BigDecimal.valueOf(amount), userId);
+        accountOperate.saveUserAccountRecord(accountRecord);
+    }
+
+    public Integer getUserLevel(String userId) {
+        User user = getById(userId);
+        Integer watchAdCounts = user.getWatchAdCounts();
+        Integer addCountsPerLevel = systemConfigOperate.findIntegerByKey(NEED_AD_COUNTS_PER_LEVEL);
+        return watchAdCounts / addCountsPerLevel;
     }
 }

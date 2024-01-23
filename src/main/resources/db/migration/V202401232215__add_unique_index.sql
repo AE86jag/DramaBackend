@@ -1,0 +1,1 @@
+ALTER TABLE user_watch_drama_record ADD UNIQUE KEY user_watch_record_index(user_id, drama_id, drama_index);

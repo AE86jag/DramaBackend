@@ -18,5 +18,18 @@ public class UserCashOutAccountApplication {
     private LocalDateTime approveTime;
     private String rejectReason;
     private LocalDateTime lastModifyTime;
-    private LocalDateTime create_time;
+    private LocalDateTime createTime;
+
+    public boolean isToApprove() {
+        return status != null && status.equals(0);
+    }
+
+    public UserAccountRecord toUserAccountRecord(String userId) {
+        UserAccountRecord record = new UserAccountRecord();
+        record.setUserId(userId);
+        record.setChangeType(UserAccountRecord.ChangeType.C);
+        record.setChangeMessage("提现");
+        record.setChangeAmount(amount.negate());
+        return record;
+    }
 }

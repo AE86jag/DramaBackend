@@ -1,6 +1,7 @@
 package com.spmystery.episode.account.cashout;
 
 import com.spmystery.episode.account.AccountOperate;
+import com.spmystery.episode.account.DramaTotalCount;
 import com.spmystery.episode.account.mapper.UserCashOutAccountApplicationMapper;
 import com.spmystery.episode.config.CacheLoadRunner;
 import com.spmystery.episode.drama.mapper.UserWatchDramaRecordMapper;
@@ -13,11 +14,13 @@ import com.spmystery.episode.user.entity.User;
 import com.spmystery.episode.util.CurrentUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.spmystery.episode.exception.DramaErrorCode.*;
 import static com.spmystery.episode.systemconfig.SystemConfigOperate.NEED_AD_COUNTS_PER_LEVEL;
@@ -42,6 +45,32 @@ public class ConfigCashOutLimitation {
     @Autowired
     private UserWatchDramaRecordMapper userWatchDramaRecordMapper;
 
+    private void checkUserLevel(CashOutCondition condition, String userId) {
+        Integer userCurrentLevel = userOperate.getUserLevel(userId);
+        if (userCurrentLevel < condition.getUserLevel()) {
+            throw new DramaException(DO004);
+        }
+    }
+
+    private void checkCashOutCountInLevel(CashOutCondition condition, String userId) {
+        int hasCashOutCount =
+                userCashOutAccountApplicationMapper.findCountByUserIdAndLevel(userId, condition.getLevel());
+        if (hasCashOutCount > condition.getCashOutCountPerDay()) {
+            throw new DramaException(DO005);
+        }
+    }
+
+    private void checkCashOutCount(String userId) {
+        Integer config = systemConfigOperate.findIntegerByKey(USER_CASH_OUT_COUNT_PER_DAY);
+        List<Integer> status = new ArrayList<>();
+        status.add(0);
+        status.add(1);
+        int count = userCashOutAccountApplicationMapper.findCountByUserIdAndStatus(userId, status);
+        if (count > config) {
+            throw new DramaException(DO006);
+        }
+    }
+
     /** [{
      *   "level": 1,
      *   "amount": 0.3  提现金额 + 在途金额 不能大于余额
@@ -53,40 +82,26 @@ public class ConfigCashOutLimitation {
      *   "cashOutCountPerDay": 3 查询当前等级当天提现记录，是否大于该配置
      * }]
      */
-    public boolean canCashOut(CashOutCondition condition) {
+    public void cashOutCheck(CashOutCondition condition, List<DramaTotalCount> dramaTotalCounts) {
         String userId = CurrentUserUtil.currentUserId();
         //TODO 是否实名认证
         //TODO 是否绑定提现账户
         //TODO 可能修改过，缓存中的提现级别在数据库中没有（刷新缓存时，有用户查询，没有做并发控制情况下）
+        if (condition.getAmount().compareTo(ZERO) <= 0) {
+            throw new DramaException(DO017);
+        }
+
 
         //判断用户等级是否要求
         if (condition.getUserLevel() > 0) {
-            User user = userOperate.getById(userId);
-            Integer watchAdCounts = user.getWatchAdCounts();
-            Integer addCountsPerLevel = systemConfigOperate.findIntegerByKey(NEED_AD_COUNTS_PER_LEVEL);
-            Integer userCurrentLevel = watchAdCounts / addCountsPerLevel;
-            if (userCurrentLevel < condition.getUserLevel()) {
-                throw new DramaException(DO004);
-            }
+            checkUserLevel(condition, userId);
         }
 
-
-        //判断用户当天该等级提现次数是否超过当前等级的提现次数上限
-        int hasCashOutCount =
-                userCashOutAccountApplicationMapper.findCountByUserIdAndLevel(userId, condition.getLevel());
-        if (hasCashOutCount > condition.getCashOutCountPerDay()) {
-            throw new DramaException(DO005);
-        }
+        //判断用户当天该等级提现次数是否超过当前等级的提现次数上限 TODO 审批中的提现算不算
+        checkCashOutCountInLevel(condition, userId);
 
         //判断用户提现次数是否超过提现总次数限制
-        Integer config = systemConfigOperate.findIntegerByKey(USER_CASH_OUT_COUNT_PER_DAY);
-        List<Integer> status = new ArrayList<>();
-        status.add(0);
-        status.add(1);
-        int count = userCashOutAccountApplicationMapper.findCountByUserIdAndStatus(userId, status);
-        if (count > config) {
-            throw new DramaException(DO006);
-        }
+        checkCashOutCount(userId);
 
         //提现金额不能大于用户余额
         BigDecimal userBalance = accountOperate.getUserBalance();
@@ -95,7 +110,7 @@ public class ConfigCashOutLimitation {
         }
         //在途的金额（不止当天） + 当前申请提现的金额 不能大于余额
         BigDecimal cashOutInDoingAmount = userCashOutAccountApplicationMapper.findSumInDoingByUserId(userId);
-        if (cashOutInDoingAmount.add(condition.getAmount()).compareTo(userBalance) > 0) {
+        if (cashOutInDoingAmount != null && cashOutInDoingAmount.add(condition.getAmount()).compareTo(userBalance) > 0) {
             throw new DramaException(DO007);
         }
 
@@ -107,10 +122,34 @@ public class ConfigCashOutLimitation {
         }
 
         //判断观看整部短剧数量是否符合要求
-        if (condition.getDramaCount() > 0) {
+        if (condition.getDramaCount() != null && condition.getDramaCount() > 0) {
+            if (CollectionUtils.isEmpty(dramaTotalCounts)) {
+                throw new DramaException(DO009);
+            }
 
+            Map<Long, Integer> userWatchDramaIndexSum = userOperate.getUserWatchRecordGroubyDramaId();
+            int completeWatchCount = 0;
+            for (DramaTotalCount dramaTotalCount : dramaTotalCounts) {
+                boolean isComplete = dramaTotalCount.isComplete(userWatchDramaIndexSum.get(dramaTotalCount.getId()));
+                if (isComplete) {
+                    completeWatchCount++;
+                }
+            }
+            if (completeWatchCount < condition.getDramaCount()) {
+                throw new DramaException(DO011, condition.getDramaCount(), completeWatchCount);
+            }
         }
-        return true;
+    }
+
+    public void cashOutApproveCheck(CashOutCondition condition) {
+        BigDecimal userBalance = accountOperate.getUserBalance();
+        if (userBalance == null || userBalance.compareTo(ZERO) <= 0) {
+            throw new DramaException(DA001);
+        }
+
+        if (userBalance.compareTo(condition.getAmount()) < 0) {
+            throw new DramaException(DO016);
+        }
     }
 
 }

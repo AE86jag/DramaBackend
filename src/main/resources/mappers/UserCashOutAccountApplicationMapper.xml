@@ -53,13 +53,13 @@
         WHERE user_id = #{userId}
         <choose>
             <when test="statuses != null and statuses.size() > 0">
-                `status` IN
+                AND `status` IN
                 <foreach collection="statuses" separator="," open="(" close=")" item="status">
                     #{status}
                 </foreach>
             </when>
             <otherwise>
-                1 = 2
+                AND 1 = 2
             </otherwise>
         </choose>
         AND DATE(create_time) = CURDATE();
@@ -81,4 +81,9 @@
         AND `status` = 0
     </select>
 
+    <select id="findById" parameterType="String" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumnList"/>
+        FROM user_cash_out_account_application
+        WHERE id = #{id}
+    </select>
 </mapper>

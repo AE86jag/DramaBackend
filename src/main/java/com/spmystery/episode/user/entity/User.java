@@ -2,6 +2,7 @@ package com.spmystery.episode.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.spmystery.episode.user.CashOutBindAccount;
 import com.spmystery.episode.util.StringUtil;
 import lombok.Data;
 
@@ -71,5 +72,12 @@ public class User {
 
     public boolean isBindCashOutAccount() {
         return StringUtil.isNotEmpty(alipayAccount) && StringUtil.isNotEmpty(alipayAccountName);
+    }
+
+    public CashOutBindAccount toCashOutBindAccount() {
+        CashOutBindAccount account = new CashOutBindAccount();
+        account.setAlipayAccount(alipayAccount);
+        account.setAlipayAccountName(alipayAccountName);
+        return account;
     }
 }

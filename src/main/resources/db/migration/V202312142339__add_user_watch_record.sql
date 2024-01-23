@@ -3,6 +3,8 @@ CREATE TABLE user_watch_drama_record(
     user_id VARCHAR(32) NOT NULL COMMENT '用户ID',
     drama_id VARCHAR(20) NOT NULL COMMENT '短剧ID',
     drama_index TINYINT(1) NOT NULL COMMENT '当前观看的短剧所属集数',
+    drama_title VARCHAR(100) COMMENT '短剧标题',
+    drama_total INT NOT NULL COMMENT '短剧总集数',
     last_modify_time DATETIME NOT NULL DEFAULT NOW() ON UPDATE NOW() COMMENT '最后一次更新时间',
     create_time DATETIME DEFAULT NOW() NOT NULL COMMENT '创建时间',
     PRIMARY KEY(id)

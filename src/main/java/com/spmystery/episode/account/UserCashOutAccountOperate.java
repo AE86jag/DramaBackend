@@ -1,26 +1,24 @@
 package com.spmystery.episode.account;
 
+import com.spmystery.episode.account.cashout.ConfigCashOutLimitation;
+import com.spmystery.episode.account.entity.UserAccountRecord;
 import com.spmystery.episode.account.entity.UserCashOutAccountApplication;
+import com.spmystery.episode.account.mapper.UserAccountRecordMapper;
 import com.spmystery.episode.account.mapper.UserCashOutAccountApplicationMapper;
 import com.spmystery.episode.config.CacheLoadRunner;
 import com.spmystery.episode.exception.DramaException;
 import com.spmystery.episode.systemconfig.SystemConfigOperate;
 import com.spmystery.episode.systemconfig.entity.CashOutCondition;
-import com.spmystery.episode.systemconfig.entity.SystemConfig;
+import com.spmystery.episode.user.UserOperate;
 import com.spmystery.episode.util.CurrentUserUtil;
 import com.spmystery.episode.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.spmystery.episode.exception.DramaErrorCode.*;
-import static com.spmystery.episode.systemconfig.SystemConfigOperate.SYSTEM_CASH_OUT_CONDITION_CONFIG;
-import static com.spmystery.episode.systemconfig.SystemConfigOperate.USER_CASH_OUT_COUNT_PER_DAY;
-import static java.math.BigDecimal.ZERO;
 
 @Component
 public class UserCashOutAccountOperate {
@@ -29,51 +27,29 @@ public class UserCashOutAccountOperate {
     private UserCashOutAccountApplicationMapper userCashOutAccountApplicationMapper;
 
     @Autowired
-    private AccountOperate accountOperate;
+    private UserOperate userOperate;
 
     @Autowired
-    private SystemConfigOperate systemConfigOperate;
+    private ConfigCashOutLimitation configCashOutLimitation;
 
-    public void cashOutApplication(Integer level, UserCashOutAccountApplication application) {
+    @Autowired
+    private UserAccountRecordMapper userAccountRecordMapper;
+
+    public void cashOutApplication(Integer level, UserCashOutAccountApplication application,
+                                   List<DramaTotalCount> dramaTotalCounts) {
+        //是否绑定提现账户
+        if (!userOperate.isBindCashOutAccount()) {
+            throw new DramaException(DO012);
+        }
         //查询
         CashOutCondition condition = CacheLoadRunner.getByLevel(level);
         if (condition == null) {
             throw new DramaException(DO001);
         }
+        //提现条件校验
+        configCashOutLimitation.cashOutCheck(condition, dramaTotalCounts);
 
-        //提现金额不能是0或者负数
-        if (application.getAmount().compareTo(ZERO) <= 0) {
-            throw new RuntimeException("提现金额必须大于0元");
-        }
-        //余额必须要是正的
-        BigDecimal userBalance = accountOperate.getUserBalance();
-        if (userBalance == null || userBalance.compareTo(ZERO) <= 0) {
-            throw new DramaException(DA001);
-        }
-
-        //提现金额不能大于余额, 流程中的金额  + 当前的金额
-        if (userBalance.compareTo(application.getAmount()) < 0) {
-            throw new RuntimeException("提现金额不能大于余额");
-        }
-
-        //每天提现次数不能大于配置的
-        SystemConfig config = systemConfigOperate.findByKey(USER_CASH_OUT_COUNT_PER_DAY);
-        if (config == null || StringUtils.isEmpty(config.getValue())) {
-            throw new DramaException(DC001);
-        }
-
-        List<Integer> status = new ArrayList<>();
-        status.add(0);
-        status.add(1);
-        int count = userCashOutAccountApplicationMapper
-                .findCountByUserIdAndStatus(CurrentUserUtil.currentUserId(), status);
-        if (count > Integer.valueOf(config.getValue())) {
-            throw new RuntimeException("今日提现次数已用完");
-        }
-
-
-        //检验用户是否满足配置的规则
-
+        userCashOutAccountApplicationMapper.insert(application);
 
         /**
          * [{
@@ -136,7 +112,42 @@ public class UserCashOutAccountOperate {
 
     }
 
-    public void cashOutApprove(String applicationId) {
+    @Transactional
+    public void cashOutApprove(String applicationId, Integer status, String rejectReason) {
+        if (status == null || (!status.equals(1) && !status.equals(2))) {
+            throw new DramaException(DO015);
+        }
 
+        if (status.equals(2) && StringUtil.isEmpty(rejectReason)) {
+            throw new DramaException(DO018);
+        }
+
+        //校验状态是否是
+        UserCashOutAccountApplication application =
+                userCashOutAccountApplicationMapper.findById(applicationId);
+        if (application == null) {
+            throw new DramaException(DO013);
+        }
+
+        if (!application.isToApprove()) {
+            throw new DramaException(DO014);
+        }
+        //审批通过
+        if (status.equals(1)) {
+            CashOutCondition condition = CacheLoadRunner.getByLevel(application.getLevel());
+            if (condition == null) {
+                throw new DramaException(DO001);
+            }
+            configCashOutLimitation.cashOutApproveCheck(condition);
+            //扣余额
+            UserAccountRecord record = application.toUserAccountRecord(CurrentUserUtil.currentUserId());
+            userAccountRecordMapper.insert(record);
+        }
+        application.setStatus(status);
+        application.setApproveUserId(CurrentUserUtil.currentUserId());
+        application.setApproveUserName(CurrentUserUtil.currentUsername());
+        application.setRejectReason(rejectReason);
+
+        userCashOutAccountApplicationMapper.updateApproveById(application);
     }
 }

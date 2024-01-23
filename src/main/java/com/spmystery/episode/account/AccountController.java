@@ -24,6 +24,9 @@ public class AccountController {
     @Autowired
     private AccountOperate accountOperate;
 
+    @Autowired
+    private UserCashOutAccountOperate userCashOutAccountOperate;
+
     @PostMapping
     public void add(@RequestBody UserAccountAddParam param) {
         //https, 签名, 时间戳
@@ -38,41 +41,19 @@ public class AccountController {
 
     @PostMapping("/cash-out/application")
     //@PreAuthorize("hasAnyRole('APP_NORMAL', 'APP_ADMIN')")
-    public CommonResponse cashOutApplication(@RequestBody CashOutApplicationParam param, HttpServletRequest request) {
-        System.out.println(request.getHeader("Token"));
-        System.out.println(param);
-        if (param.getLevel() > 3) {
-            throw new RuntimeException("提现金额过大");
-        }
-        return CommonResponse.build(null);
+    public void cashOutApplication(@RequestBody CashOutApplicationParam param) {
+        userCashOutAccountOperate.cashOutApplication(param.getLevel(), param.to(), param.getDramaTotalParams());
     }
 
-    @GetMapping("/record")
-    public List<UserAccountRecord> getAccountRecord() {
-        List<UserAccountRecord> records = new ArrayList<>();
-        UserAccountRecord r1 = new UserAccountRecord();
-        r1.setId(1);
-        r1.setUserId("u1");
-        r1.setChangeAmount(new BigDecimal("+123.88"));
-        r1.setChangeMessage("增加");
-        r1.setCreateTime(LocalDateTime.now());
-        records.add(r1);
+    @PutMapping("/cash-out/approve/{applicationId}")
+    //@PreAuthorize("hasAnyRole('APP_ADMIN')")
+    public void cashOutApprove(@PathVariable String applicationId, @RequestParam Integer status, String rejectReason) {
+        userCashOutAccountOperate.cashOutApprove(applicationId, status, rejectReason);
+    }
 
-        UserAccountRecord r2 = new UserAccountRecord();
-        r2.setId(2);
-        r2.setUserId("u2");
-        r2.setChangeAmount(new BigDecimal("-223.88"));
-        r2.setChangeMessage("增加3444");
-        r2.setCreateTime(LocalDateTime.now());
-        records.add(r2);
-        records.add(r1);
-        records.add(r2);
-        records.add(r1);
-        records.add(r2);
-        records.add(r1);
-        records.add(r2);
-        records.add(r1);
-        return records;
+    @GetMapping("/records")
+    public List<UserAccountRecord> getAccountRecord() {
+        return accountOperate.getUserAccountRecords();
     }
 
     @GetMapping("/cash-out-amount/config")

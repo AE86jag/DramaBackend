@@ -8,22 +8,32 @@
         <result column="user_id" property="userId"/>
         <result column="drama_id" property="dramaId"/>
         <result column="drama_index" property="dramaIndex"/>
+        <result column="drama_title" property="dramaTitle"/>
+        <result column="drama_total" property="dramaTotal"/>
         <result column="last_modify_time" property="lastModifyTime"/>
         <result column="create_time" property="createTime"/>
     </resultMap>
 
 
     <sql id="BaseColumnList">
-        id, user_id, drama_id, drama_index, last_modify_time, create_time
+        id, user_id, drama_id, drama_index, drama_title, drama_total, last_modify_time, create_time
     </sql>
 
     <insert id="insert" parameterType="UserWatchDramaRecord">
-        INSERT INTO user_watch_drama_record(user_id, drama_id, drama_index)
-        VALUES (#{userId}, #{dramaId}, #{dramaIndex})
+        INSERT INTO user_watch_drama_record(user_id, drama_id, drama_index, drama_title, drama_total)
+        VALUES (#{userId}, #{dramaId}, #{dramaIndex}, #{dramaTitle}, #{dramaTotal})
+        ON DUPLICATE KEY UPDATE
+        drama_total = values(drama_total)
     </insert>
 
     <select id="findCountByUserId" parameterType="String" resultType="Integer">
         SELECT count(DISTINCT drama_id, drama_index) FROM user_watch_drama_record
         WHERE user_id = #{userId}
+    </select>
+
+    <select id="findByKey" parameterType="map" resultType="Integer">
+        SELECT count(1)
+        FROM user_watch_drama_record
+        WHERE user_id = #{userId} AND drama_id = #{dramaId} AND drama_index = #{dramaIndex}
     </select>
 </mapper>

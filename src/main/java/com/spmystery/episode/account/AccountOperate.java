@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @Component
@@ -50,5 +51,13 @@ public class AccountOperate {
 
     public BigDecimal getUserBalance() {
         return userAccountRecordMapper.findSumByUserId(CurrentUserUtil.currentUserId());
+    }
+
+    public List<UserAccountRecord> getUserAccountRecords() {
+        return userAccountRecordMapper.findUserAccountRecordsById(CurrentUserUtil.currentUserId());
+    }
+
+    public int saveUserAccountRecord(UserAccountRecord record) {
+        return userAccountRecordMapper.insert(record);
     }
 }

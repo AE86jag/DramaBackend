@@ -21,4 +21,6 @@ public interface UserCashOutAccountApplicationMapper {
     int findCountByUserIdAndLevel(@Param("userId") String userId, @Param("level") Integer level);
 
     BigDecimal findSumInDoingByUserId(String userId);
+
+    UserCashOutAccountApplication findById(String id);
 }
