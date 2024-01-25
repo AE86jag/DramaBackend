@@ -1,6 +1,8 @@
 package com.spmystery.episode.user;
 
+import com.spmystery.episode.account.AccountOperate;
 import com.spmystery.episode.account.BindCashOutAccountParam;
+import com.spmystery.episode.response.CommonResponse;
 import com.spmystery.episode.user.entity.Token;
 import com.spmystery.episode.user.entity.User;
 import com.spmystery.episode.user.mapper.TokenOperate;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RequestMapping("/user")
@@ -19,6 +22,9 @@ public class UserController {
 
     @Autowired
     private TokenOperate tokenOperate;
+
+    @Autowired
+    private AccountOperate accountOperate;
 
     @PostMapping("/register")
     public Token register(@RequestBody UserRegisterParam userRegisterParam) {
@@ -65,5 +71,11 @@ public class UserController {
     public void userWatchDrama(@RequestBody UserWatchDramaParam param) {
         param.check();
         userOperate.watchDrama(param);
+    }
+
+    @GetMapping("/balance")
+    public CommonResponse<BigDecimal> getUserBalance() {
+        BigDecimal userBalance = accountOperate.getUserBalance();
+        return CommonResponse.build(userBalance);
     }
 }

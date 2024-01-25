@@ -13,8 +13,8 @@ public class CommonResponse<T> {
 
     private String errorMessage;
 
-    public static CommonResponse<Object> build(Object data) {
-        CommonResponse<Object> response = new CommonResponse<>();
+    public static <T> CommonResponse<T> build(T data) {
+        CommonResponse<T> response = new CommonResponse<>();
         response.setCode(SUCCESS.name());
         response.setData(data);
         return response;

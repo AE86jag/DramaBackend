@@ -162,6 +162,6 @@ public class UserOperate {
         User user = getById(userId);
         Integer watchAdCounts = user.getWatchAdCounts();
         Integer addCountsPerLevel = systemConfigOperate.findIntegerByKey(NEED_AD_COUNTS_PER_LEVEL);
-        return watchAdCounts / addCountsPerLevel;
+        return watchAdCounts / addCountsPerLevel + 1;
     }
 }
