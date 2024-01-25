@@ -19,4 +19,7 @@ public interface UserAccountRecordMapper {
                                  @Param("changeType")UserAccountRecord.ChangeType changeType);
 
     List<UserAccountRecord> findUserAccountRecordsById(String userId);
+
+    int findCurrentDayCountByUserIdAndChangeType(@Param("userId") String userId,
+                                                @Param("changeType") UserAccountRecord.ChangeType changeType);
 }

@@ -49,7 +49,13 @@
         SELECT id, user_id, change_type, change_message, change_amount, last_modify_time, create_time
         FROM user_account_record
         WHERE user_id = #{userId}
+        ORDER BY create_time DESC
     </select>
 
+    <select id="findCurrentDayCountByUserIdAndChangeType" parameterType="map" resultType="Integer">
+        SELECT count(*)
+        FROM
+        WHERE user_id = #{userId} AND change_type = #{changeType} AND DATE(create_time) = CURDATE();
+    </select>
 
 </mapper>

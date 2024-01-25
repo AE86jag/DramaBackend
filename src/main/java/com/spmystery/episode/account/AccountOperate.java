@@ -60,4 +60,8 @@ public class AccountOperate {
     public int saveUserAccountRecord(UserAccountRecord record) {
         return userAccountRecordMapper.insert(record);
     }
+
+    public int getCurrentDayUserWatchAdCount(String userId, UserAccountRecord.ChangeType changeType) {
+        return userAccountRecordMapper.findCountByUserIdAndType(userId, changeType);
+    }
 }

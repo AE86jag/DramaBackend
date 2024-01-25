@@ -33,11 +33,14 @@ public enum DramaErrorCode implements IErrorCode {
     DU001("用户不存在"),
     DU002("用户已失效"),
     DU003("用户已绑定提现账户"),
+    DU004("未登录，请先登录"),
+    DU005("当天已签到，请勿重复签到"),
 
     //短剧相关
     DD001("短剧ID不能为空"),
     DD002("短剧集数不能为空"),
-    DD003("短剧总集数不能为空")
+    DD003("短剧总集数不能为空"),
+    DD004("观看广告增加积分达到当天上线")
     ;
 
     DramaErrorCode(String message) {

@@ -34,7 +34,8 @@ public class UserAccountRecord {
         D("看完一集短剧", USER_WATCHING_ONE_DRAMA),
         A("看完广告", USER_WATCHING_ADVERTISEMENTS),
         I("邀请", INVITE_USER_REWARD),
-        R("注册", USER_REGISTER_REWARD);
+        R("注册", USER_REGISTER_REWARD),
+        S("签到");
 
         private String description;
 

@@ -20,6 +20,7 @@ public class SystemConfigOperate {
     public static final String USER_CASH_OUT_COUNT_PER_DAY = "user_cash_out_count_per_day";
     public static final String SYSTEM_CASH_OUT_CONDITION_CONFIG = "system_cash_out_condition_config";
     public static final String NEED_AD_COUNTS_PER_LEVEL = "need_ad_counts_per_level";
+    public static final String ADD_ACCOUNT_BALANCE_LIMIT_WHEN_WATCH_AD = "add_account_balance_limit_when_watch_ad";
 
     @Autowired
     private SystemConfigMapper systemConfigMapper;

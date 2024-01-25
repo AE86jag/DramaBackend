@@ -68,14 +68,19 @@ public class UserController {
 
     //TODO 要带权限，要非对称加密，控制频率,要同一个用户ID1分钟之内不能调多次，一般短剧至少1分钟
     @PostMapping("/watch-drama")
-    public void userWatchDrama(@RequestBody UserWatchDramaParam param) {
+    public BigDecimal userWatchDrama(@RequestBody UserWatchDramaParam param) {
         param.check();
-        userOperate.watchDrama(param);
+        return userOperate.watchDrama(param);
     }
 
     @GetMapping("/balance")
     public CommonResponse<BigDecimal> getUserBalance() {
         BigDecimal userBalance = accountOperate.getUserBalance();
         return CommonResponse.build(userBalance);
+    }
+
+    @PostMapping("/sign-in")
+    public void userSignIn() {
+        userOperate.signIn();
     }
 }

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.spmystery.episode.exception.DramaErrorCode.*;
+import static com.spmystery.episode.systemconfig.SystemConfigOperate.ADD_ACCOUNT_BALANCE_LIMIT_WHEN_WATCH_AD;
 import static com.spmystery.episode.systemconfig.SystemConfigOperate.NEED_AD_COUNTS_PER_LEVEL;
 
 @Component
@@ -76,8 +77,23 @@ public class UserOperate {
         if (!CurrentUserUtil.isLogin()) {
             return;
         }
+
         String userId = CurrentUserUtil.currentUserId();
         userMapper.updateWatchAdCountsById(userId);
+
+        int count = accountOperate.getCurrentDayUserWatchAdCount(userId, UserAccountRecord.ChangeType.A);
+
+        Integer limit = systemConfigOperate.findIntegerByKey(ADD_ACCOUNT_BALANCE_LIMIT_WHEN_WATCH_AD);
+        if (limit == null || limit <count) {
+            throw new DramaException(DD004);
+        }
+
+        UserAccountRecord accountRecord = new UserAccountRecord();
+        accountRecord.setUserId(userId);
+        accountRecord.setChangeAmount(getRandomScore(userId));
+        accountRecord.setChangeMessage("观看广告");
+        accountRecord.setChangeType(UserAccountRecord.ChangeType.A);
+        accountOperate.saveUserAccountRecord(accountRecord);
     }
 
     public User getById(String userId) {
@@ -135,16 +151,16 @@ public class UserOperate {
     }
 
     @Transactional
-    public void watchDrama(UserWatchDramaParam param) {
+    public BigDecimal watchDrama(UserWatchDramaParam param) {
         if (!CurrentUserUtil.isLogin()) {
-            return;
+            return BigDecimal.ZERO;
         }
 
         String userId = CurrentUserUtil.currentUserId();
         int count = userWatchDramaRecordMapper.findByKey(userId, param.getDramaId(), param.getDramaIndex());
         if (count > 0) {
             log.info("duplicate watch");
-            return;
+            return BigDecimal.ZERO;
         }
 
         //加观看记录
@@ -152,10 +168,10 @@ public class UserOperate {
         userWatchDramaRecordMapper.insert(record);
 
         //加积分
-        Integer userLevel = getUserLevel(userId);
-        double amount = Math.random() * userLevel * 10;
-        UserAccountRecord accountRecord = param.toUserAccountRecord(BigDecimal.valueOf(amount), userId);
+        BigDecimal decimal = getRandomScore(userId);
+        UserAccountRecord accountRecord = param.toUserAccountRecord(decimal, userId);
         accountOperate.saveUserAccountRecord(accountRecord);
+        return decimal;
     }
 
     public Integer getUserLevel(String userId) {
@@ -163,5 +179,31 @@ public class UserOperate {
         Integer watchAdCounts = user.getWatchAdCounts();
         Integer addCountsPerLevel = systemConfigOperate.findIntegerByKey(NEED_AD_COUNTS_PER_LEVEL);
         return watchAdCounts / addCountsPerLevel + 1;
+    }
+
+    public BigDecimal getRandomScore(String userId) {
+        Integer userLevel = getUserLevel(userId);
+        double amount = Math.random() * userLevel * 10;
+        BigDecimal result = BigDecimal.valueOf(amount);
+        return result.setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
+    public void signIn() {
+        if (!CurrentUserUtil.isLogin()) {
+            throw new DramaException(DU004);
+        }
+
+        String userId = CurrentUserUtil.currentUserId();
+        int count = accountOperate.getCurrentDayUserWatchAdCount(userId, UserAccountRecord.ChangeType.S);
+        if (count > 0) {
+            throw new DramaException(DU005);
+        }
+
+        UserAccountRecord accountRecord = new UserAccountRecord();
+        accountRecord.setUserId(userId);
+        accountRecord.setChangeAmount(getRandomScore(userId));
+        accountRecord.setChangeMessage("签到");
+        accountRecord.setChangeType(UserAccountRecord.ChangeType.S);
+        accountOperate.saveUserAccountRecord(accountRecord);
     }
 }
