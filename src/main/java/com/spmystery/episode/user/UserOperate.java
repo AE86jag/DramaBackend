@@ -53,34 +53,31 @@ public class UserOperate {
         tokenOperate.delete(user.getId());
 
         User existUser = userMapper.findByOpenId(user.getOpenId());
-        if (existUser != null) {
-            throw new RuntimeException("用户状态异常, 请重试");
+        if (existUser == null) {
+            user.setId(StringUtil.generateId());
+            user.setStatus(1);
+            //TODO 邀请人ID怎么传
+            //user.setInviteUserId();
+            System.out.println("---------------");
+            System.out.println(user);
+            System.out.println("---------------");
+            userMapper.insert(user);
+            userMapper.insertUserRole(UserRole.build(user.getId()));
+
+            accountOperate.add(UserAccountRecord.buildRegisterRecord(user.getId()));
+            return tokenOperate.create(user);
         }
-        user.setId(StringUtil.generateId());
-        user.setStatus(1);
-        //TODO 邀请人ID怎么传
-        //user.setInviteUserId();
-        System.out.println("---------------");
-        System.out.println(user);
-        System.out.println("---------------");
-        userMapper.insert(user);
-        userMapper.insertUserRole(UserRole.build(user.getId()));
-
-        accountOperate.add(UserAccountRecord.buildRegisterRecord(user.getId()));
-
         //进行登录
-        return tokenOperate.create(user);
-
+        return tokenOperate.create(existUser);
     }
 
+    @Transactional
     public void addUserAdCount() {
         if (!CurrentUserUtil.isLogin()) {
             return;
         }
 
         String userId = CurrentUserUtil.currentUserId();
-        userMapper.updateWatchAdCountsById(userId);
-
         int count = accountOperate.getCurrentDayUserWatchAdCount(userId, UserAccountRecord.ChangeType.A);
 
         Integer limit = systemConfigOperate.findIntegerByKey(ADD_ACCOUNT_BALANCE_LIMIT_WHEN_WATCH_AD);
@@ -88,11 +85,31 @@ public class UserOperate {
             throw new DramaException(DD004);
         }
 
+        userMapper.updateWatchAdCountsById(userId);
+
         UserAccountRecord accountRecord = new UserAccountRecord();
         accountRecord.setUserId(userId);
         accountRecord.setChangeAmount(getRandomScore(userId));
         accountRecord.setChangeMessage("观看广告");
         accountRecord.setChangeType(UserAccountRecord.ChangeType.A);
+        accountOperate.saveUserAccountRecord(accountRecord);
+    }
+
+    @Transactional
+    public void inviteUser(String userId) {
+        User user = userMapper.findById(userId);
+        if (user == null || !user.isValid()) {
+            log.warn("user not exist or is invalid");
+            return;
+        }
+
+        userMapper.updateInviteUserCountById(userId);
+
+        UserAccountRecord accountRecord = new UserAccountRecord();
+        accountRecord.setUserId(userId);
+        accountRecord.setChangeAmount(getRandomScore(userId));
+        accountRecord.setChangeMessage("邀请用户");
+        accountRecord.setChangeType(UserAccountRecord.ChangeType.I);
         accountOperate.saveUserAccountRecord(accountRecord);
     }
 

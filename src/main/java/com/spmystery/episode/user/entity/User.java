@@ -56,13 +56,14 @@ public class User {
 
     private String alipayAccountName;
 
+    private Integer inviteUserCount;
+
     private List<String> roleIds;
 
-    //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
-    @JsonIgnore
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     private LocalDateTime lastModifyTime;
-    //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
-    @JsonIgnore
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     private LocalDateTime createTime;
 
     @JsonIgnore

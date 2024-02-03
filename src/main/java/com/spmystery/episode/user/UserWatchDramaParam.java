@@ -52,7 +52,7 @@ public class UserWatchDramaParam {
         record.setUserId(userId);
         record.setChangeAmount(amount);
         record.setChangeType(D);
-        record.setChangeMessage("观看短剧:《" + dramaTitle + "》");
+        record.setChangeMessage("观看短剧:《" + dramaTitle + "(第" + dramaIndex + "集)》");
         return record;
     }
 }

@@ -150,4 +150,8 @@ public class UserCashOutAccountOperate {
 
         userCashOutAccountApplicationMapper.updateApproveById(application);
     }
+
+    public List<UserCashOutAccountApplication> getUserCashOutApplications() {
+        return userCashOutAccountApplicationMapper.findByUserId(CurrentUserUtil.currentUserId());
+    }
 }

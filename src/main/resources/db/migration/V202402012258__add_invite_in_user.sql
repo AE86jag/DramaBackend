@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD COLUMN invite_user_count INT(11) DEFAULT 0 COMMENT '邀请人数';

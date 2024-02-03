@@ -14,7 +14,7 @@
         <result column="approve_time" property="approveTime"/>
         <result column="reject_reason" property="rejectReason"/>
         <result column="last_modify_time" property="lastModifyTime"/>
-        <result column="create_time" property="create_time"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
 
     <sql id="BaseColumnList">
@@ -24,7 +24,7 @@
     <insert id="insert" parameterType="UserCashOutAccountApplication">
         INSERT INTO user_cash_out_account_application
         (user_id, amount, `status`, `level`, approve_user_id, approve_user_name, approve_time, reject_reason)
-        VALUES (#{userId}, #{amount}, #{status}, #{level}, #{approveUserId}, #{approveUserName}, #{approveTime}, #{reject_reason})
+        VALUES (#{userId}, #{amount}, #{status}, #{level}, #{approveUserId}, #{approveUserName}, #{approveTime}, #{rejectReason})
     </insert>
 
     <select id="findByUserId" resultMap="BaseResultMap" parameterType="String">
@@ -32,6 +32,7 @@
         <include refid="BaseColumnList"/>
         FROM user_cash_out_account_application
         WHERE user_id = #{userId}
+        ORDER BY create_time DESC
     </select>
 
 

@@ -27,6 +27,8 @@ public interface UserMapper {
 
     int updateWatchAdCountsById(String id);
 
+    int updateInviteUserCountById(String id);
+
     int updateAccountAndNameById(@Param("id") String id, @Param("alipayAccount") String alipayAccount,
                                  @Param("alipayAccountName") String alipayAccountName);
 

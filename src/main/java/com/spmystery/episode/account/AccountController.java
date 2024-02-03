@@ -1,6 +1,7 @@
 package com.spmystery.episode.account;
 
 import com.spmystery.episode.account.entity.UserAccountRecord;
+import com.spmystery.episode.account.entity.UserCashOutAccountApplication;
 import com.spmystery.episode.config.CacheLoadRunner;
 import com.spmystery.episode.response.CommonResponse;
 import com.spmystery.episode.systemconfig.entity.CashOutCondition;
@@ -43,6 +44,11 @@ public class AccountController {
     //@PreAuthorize("hasAnyRole('APP_NORMAL', 'APP_ADMIN')")
     public void cashOutApplication(@RequestBody CashOutApplicationParam param) {
         userCashOutAccountOperate.cashOutApplication(param.getLevel(), param.to(), param.getDramaTotalParams());
+    }
+
+    @GetMapping("/cash-out/applications")
+    public List<UserCashOutAccountApplication> getUserCashOutApplications() {
+        return userCashOutAccountOperate.getUserCashOutApplications();
     }
 
     @PutMapping("/cash-out/approve/{applicationId}")

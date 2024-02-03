@@ -28,7 +28,20 @@ title=神医的绝代双娇, type=都市, script_name=, total=60, video_size=917
 group_id=7264515034716684861, cover_image=https://content.volccdn.com/obj/feedcoop/skit/0547.jpg, drama_id=547, status=0, 
 desc=李不凡学得一身好医术，下山行医并完成所指配的婚约。李不凡辗转至唐家，却意外卷入唐家双胞胎姐妹的争夺漩涡之中。在面临选择的同时，李不凡意外发现当年陷害自己父亲的人也逐渐浮出水面。看少年神医如何救治唐家众人，替父报仇的同时收获爱情。}
 
+#### 后台启动应用
+nohup java -jar Drama-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod &
 
+#### 查看Linux运行的进程
+ps -aux | grep Drama-0.0.1-SNAPSHOT.jar
+
+#### 结束进程
+kill -9  进程号
+
+#### 查看真机日志
+先查看安卓设备号
+adb devices
+将下面设备号换成上面查询出来的
+adb logcat -d 9097525f
 
 #### 使用说明
 

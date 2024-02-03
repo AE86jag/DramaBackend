@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -40,6 +41,15 @@ public class UserController {
     @PreAuthorize("hasAnyRole('APP_NORMAL')")
     //TODO 防刷 非对称加密
     public void addUserWatchAdCounts() {
+        userOperate.addUserAdCount();
+    }
+
+    @PostMapping("/invite")
+    //TODO 防刷 非对称加密
+    public void invite(HttpServletRequest request) {
+        // TODO
+        //  校验邀请的ID是否真实用户ID
+        //  校验请求头
         userOperate.addUserAdCount();
     }
 
