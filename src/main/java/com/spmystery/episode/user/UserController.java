@@ -5,6 +5,7 @@ import com.spmystery.episode.account.BindCashOutAccountParam;
 import com.spmystery.episode.response.CommonResponse;
 import com.spmystery.episode.user.entity.Token;
 import com.spmystery.episode.user.entity.User;
+import com.spmystery.episode.user.entity.UserToken;
 import com.spmystery.episode.user.mapper.TokenOperate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,8 +29,9 @@ public class UserController {
     private AccountOperate accountOperate;
 
     @PostMapping("/register")
-    public Token register(@RequestBody UserRegisterParam userRegisterParam) {
-        return userOperate.register(userRegisterParam.toUser());
+    public UserToken register(@RequestBody UserRegisterParam userRegisterParam) {
+        Token token = userOperate.register(userRegisterParam.toUser());
+        return UserToken.from(token);
     }
 
     @GetMapping("/token/{tokenId}")

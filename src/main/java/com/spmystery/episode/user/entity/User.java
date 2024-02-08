@@ -71,6 +71,7 @@ public class User {
         return status != null && status.equals(1);
     }
 
+    @JsonIgnore
     public boolean isBindCashOutAccount() {
         return StringUtil.isNotEmpty(alipayAccount) && StringUtil.isNotEmpty(alipayAccountName);
     }
